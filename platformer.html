@@ -1,0 +1,77 @@
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const gravity = 0.5;
+const friction = 0.8;
+
+class Player {
+    constructor() {
+        this.width = 50;
+        this.height = 50;
+        this.x = 100;
+        this.y = canvas.height - this.height;
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.speed = 5;
+        this.jumpPower = 15;
+        this.grounded = false;
+    }
+
+    draw() {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    update() {
+        if (this.y + this.height < canvas.height) {
+            this.velocityY += gravity;
+        } else {
+            this.velocityY = 0;
+            this.grounded = true;
+            this.y = canvas.height - this.height;
+        }
+
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+
+        if (this.grounded && keys[' ']) {
+            this.velocityY = -this.jumpPower;
+            this.grounded = false;
+        }
+
+        this.velocityX *= friction;
+
+        this.draw();
+    }
+}
+
+const player = new Player();
+
+const keys = {};
+
+document.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+});
+
+document.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+});
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    player.update();
+
+    if (keys['ArrowRight']) {
+        player.velocityX = player.speed;
+    }
+    if (keys['ArrowLeft']) {
+        player.velocityX = -player.speed;
+    }
+
+    requestAnimationFrame(animate);
+}
+
+animate();
